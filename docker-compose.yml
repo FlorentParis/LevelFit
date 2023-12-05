@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ./api
+    depends_on:
+      - db
+    restart: on-failure
+    container_name: api_backend
+    ports:
+      - '4000:4000'
+      - '9229:9229'
+    volumes:
+      - ./api:/app
+      - ./nodemon.json:/home/node/app/nodemon.json
+
+  client:
+    build:
+      context: ./client
+    restart: always
+    container_name: client_frontend
+    ports:
+      - '3000:3000'
+
+  db:
+    image: mariadb:10.6
+    restart: always
+    environment:
+      MYSQL_DATABASE: levelfit_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: notSecureChangeMe
+      MYSQL_ROOT_PASSWORD: notSecureChangeMe
+    # Pour lancer un dump automatiquement au montage du conteneur
+    # volumes:
+    #   - ./dumpSql/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
